@@ -1,2 +1,2 @@
-# Competition-Codes
-Solution codes for coding competition such as HackerRank, IEEEXtream, CS Academy etc.
+# competition-codes
+Solution codes for coding competitions such as HackerRank, IEEEXtream, CS Academy etc.
