@@ -1,3 +1,6 @@
 # ignore ALL .log files
 *.log
 *.exe
+*.out
+code
+.vscode/tasks.json
