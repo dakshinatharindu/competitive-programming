@@ -1,9 +1,12 @@
 CC = g++
 TARGETS = code
 
-$(TARGETS):
-ifdef toto
-		$(CC) -o $@ $(toto)
+run: build
+	@./$(TARGETS)
+
+build:
+ifdef SOURCE
+		@$(CC) -o $(TARGETS) $(SOURCE)
 else
 		@echo 'path not found'
 endif
