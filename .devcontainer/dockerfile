@@ -1,0 +1,22 @@
+# Use Debian image from Docker Hub
+FROM dakshinatharindu/debian:latest
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+# Install dependencies (you can modify this based on your needs)
+RUN apt-get update && apt-get install -y \
+ sudo \
+ git \
+ curl \
+ vim \
+ build-essential \
+ python3 \
+ python3-pip \
+ && apt-get clean
+# Create a new user with a home directory and set a default shell
+RUN useradd -m -s /bin/bash vscode
+# Give the new user sudo privileges
+RUN echo 'vscode ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+# Set the working directory for the user
+WORKDIR /home/vscode
+# Set the default command to bash (this can be modified as needed)
+CMD ["/bin/bash"]
