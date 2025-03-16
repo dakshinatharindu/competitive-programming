@@ -8,6 +8,28 @@ RedBlackTree::~RedBlackTree() {
     delete root;  // Destructor to clean up the tree
 }
 
+std::string RedBlackTree::randomPlate() {
+    std::string plateNum;
+    // Generate a random license plate number with 4 charaters including A-Z and 0-9
+    for (int i = 0; i < 4; ++i) {
+        int rand = std::rand() % 36;  // 26 letters + 10 digits
+        if (rand < 26) {
+            plateNum += 'A' + rand;  // A-Z
+        } else {
+            plateNum += '0' + (rand - 26);  // 0-9
+        }
+    }
+    return plateNum;
+}
+
+void RedBlackTree::addLicense() {
+    std::string plateNum;
+
+    do {
+        plateNum = randomPlate();
+    } while (!addLicense(plateNum));
+}
+
 bool RedBlackTree::addLicense(std::string plateNum) {
     Node* newPlate = new Node(plateNum);
     Node* parent = nullptr;
@@ -40,8 +62,7 @@ bool RedBlackTree::addLicense(std::string plateNum) {
 void RedBlackTree::fixInsertion(Node*& newPlate) {
     Node* parent = nullptr;
     Node* grandparent = nullptr;
-    while ((newPlate != root) && (newPlate->color == RED) &&
-           (newPlate->parent->color == RED)) {
+    while ((newPlate != root) && (newPlate->color == RED) && (newPlate->parent->color == RED)) {
         parent = newPlate->parent;
         grandparent = parent->parent;
 
@@ -56,13 +77,14 @@ void RedBlackTree::fixInsertion(Node*& newPlate) {
             } else {
                 // Case LYb: d is black
                 if (newPlate == parent->right) {
-                    RRRotation(parent);  // Case 2a: newPlate is right child
-                    newPlate = parent;   // Update newPlate to parent
+                    RRRotation(parent);         // Case 2a: newPlate is right child
+                    newPlate = parent;          // Update newPlate to parent
                     parent = newPlate->parent;  // Update parent
                 }
                 // Case 2b: newPlate is left child
                 LLRotation(grandparent);
-                std::swap(parent->color, grandparent->color);  // Swap colors
+                std::swap(parent->color,
+                          grandparent->color);  // Swap colors
                 newPlate = parent;
             }
         } else {
@@ -76,13 +98,14 @@ void RedBlackTree::fixInsertion(Node*& newPlate) {
             } else {
                 // Case RYb: d is black
                 if (newPlate == parent->left) {
-                    LLRotation(parent);  // Case 2a: newPlate is left child
-                    newPlate = parent;   // Update newPlate to parent
+                    LLRotation(parent);         // Case 2a: newPlate is left child
+                    newPlate = parent;          // Update newPlate to parent
                     parent = newPlate->parent;  // Update parent
                 }
                 // Case 2b: newPlate is right child
                 RRRotation(grandparent);
-                std::swap(parent->color, grandparent->color);  // Swap colors
+                std::swap(parent->color,
+                          grandparent->color);  // Swap colors
                 newPlate = parent;
             }
         }

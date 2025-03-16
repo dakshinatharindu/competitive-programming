@@ -21,6 +21,7 @@ class RedBlackTree {
     Node *root;
 
     // Helper functions for red-black tree properties
+    std::string randomPlate();
     void LLRotation(Node *&node);
     void RRRotation(Node *&node);
     void fixInsertion(Node *&newPlate);
@@ -29,7 +30,7 @@ class RedBlackTree {
     RedBlackTree();
     ~RedBlackTree();
     bool addLicense(std::string plateNum);
-    bool addLicense();
+    void addLicense();
     void dropLicense(std::string plateNum);
     void lookupLicense(std::string plateNum);
     void lookupPrev(std::string plateNum);
