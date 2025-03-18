@@ -25,13 +25,15 @@ class RedBlackTree {
     void LLRotation(Node *&node);
     void RRRotation(Node *&node);
     void fixInsertion(Node *&newPlate);
+    void fixDeletion(Node *&y, Node *&py);
+    void transplant(Node *&u, Node *&v);
 
    public:
     RedBlackTree();
     ~RedBlackTree();
     bool addLicense(std::string plateNum);
     void addLicense();
-    void dropLicense(std::string plateNum);
+    bool dropLicense(std::string plateNum);
     void lookupLicense(std::string plateNum);
     void lookupPrev(std::string plateNum);
     void lookupNext(std::string plateNum);

@@ -2,24 +2,13 @@
 
 #include <iostream>
 
+//////////////////////////////////////////////////////////////////////////////////
+// Public member functions
+//////////////////////////////////////////////////////////////////////////////////
 RedBlackTree::RedBlackTree() : root(nullptr) {}
 
 RedBlackTree::~RedBlackTree() {
     delete root;  // Destructor to clean up the tree
-}
-
-std::string RedBlackTree::randomPlate() {
-    std::string plateNum;
-    // Generate a random license plate number with 4 charaters including A-Z and 0-9
-    for (int i = 0; i < 4; ++i) {
-        int rand = std::rand() % 36;  // 26 letters + 10 digits
-        if (rand < 26) {
-            plateNum += 'A' + rand;  // A-Z
-        } else {
-            plateNum += '0' + (rand - 26);  // 0-9
-        }
-    }
-    return plateNum;
 }
 
 void RedBlackTree::addLicense() {
@@ -57,6 +46,105 @@ bool RedBlackTree::addLicense(std::string plateNum) {
 
     fixInsertion(newPlate);  // Fix the red-black tree properties
     return true;
+}
+
+bool RedBlackTree::dropLicense(std::string plateNum) {
+    Node* current = root;
+    while (current != nullptr) {
+        if (plateNum < current->plateNum) {
+            current = current->left;
+        } else if (plateNum > current->plateNum) {
+            current = current->right;
+        } else {
+            break;
+        }
+    }
+    if (current == nullptr) {
+        return false;  // License plate not found
+    }
+
+    Node *y, *py;
+    Color removeColor;
+    // Case 1: Node to be deleted has no children (leaf node)
+    if (current->left == nullptr && current->right == nullptr) {
+        if (current == root) {
+            delete current;
+            root = nullptr;  // Tree is now empty
+            return true;
+        }
+        if (current->parent->left == current) {
+            current->parent->left = nullptr;
+        } else {
+            current->parent->right = nullptr;
+        }
+        removeColor = current->color;
+        y = nullptr;
+        py = current->parent;
+
+        delete current;  // Delete the leaf node
+    } else if (current->left == nullptr || current->right == nullptr) {
+        // Case 2: Node to be deleted has one child
+        y = (current->left != nullptr) ? current->left : current->right;
+        if (current == root) {
+            root = y;
+            return true;
+        }
+        if (current->parent->left == current) {
+            current->parent->left = y;
+        } else {
+            current->parent->right = y;
+        }
+        removeColor = current->color;
+        y->parent = current->parent;
+        py = current->parent;
+
+        delete current;  // Delete the node with one child
+    } else {
+        // Case 3: Node to be deleted has two children
+        // Find the in-order predecessor (max of left subtree)
+        Node* pred = current->left;
+        while (pred->right != nullptr) {
+            pred = pred->right;
+        }
+        // Swap the values of current and pred
+        current->plateNum = pred->plateNum;
+        removeColor = pred->color;  // Store the color of the predecessor
+        // Now we need to delete the predecessor
+        y = (pred->left != nullptr) ? pred->left : nullptr;
+
+        if (pred->parent->left == pred) {
+            pred->parent->left = y;
+        } else {
+            pred->parent->right = y;
+        }
+        if (y != nullptr) {
+            y->parent = pred->parent;
+        }
+        py = pred->parent;
+        delete pred;  // Delete the predecessor
+    }
+    // Fix the red-black tree properties after deletion
+    if (removeColor == BLACK) {
+        fixDeletion(y, py);  // Fix the tree if we removed a black node
+    }
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// Private member functions
+//////////////////////////////////////////////////////////////////////////////////
+std::string RedBlackTree::randomPlate() {
+    std::string plateNum;
+    // Generate a random license plate number with 4 charaters including A-Z and 0-9
+    for (int i = 0; i < 4; ++i) {
+        int rand = std::rand() % 36;  // 26 letters + 10 digits
+        if (rand < 26) {
+            plateNum += 'A' + rand;  // A-Z
+        } else {
+            plateNum += '0' + (rand - 26);  // 0-9
+        }
+    }
+    return plateNum;
 }
 
 void RedBlackTree::fixInsertion(Node*& newPlate) {
@@ -111,6 +199,9 @@ void RedBlackTree::fixInsertion(Node*& newPlate) {
         }
     }
     root->color = BLACK;  // Ensure the root is always black
+}
+
+void RedBlackTree::fixDeletion(Node*& y, Node*& py) {
 }
 
 void RedBlackTree::LLRotation(Node*& node) {
