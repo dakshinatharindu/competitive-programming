@@ -6,6 +6,16 @@
 
 #include "red_black_tree.h"
 
+std::string getSubstringBetweenQuotes(const std::string& str) {
+    size_t start = str.find_first_of('"');
+    size_t end = str.find_last_of('"');
+
+    if (start != std::string::npos && end != std::string::npos && start != end) {
+        return str.substr(start + 1, end - start - 1);
+    }
+    return "";  // Return an empty string if quotes are not found or are invalid
+}
+
 int main(int argc, char* argv[]) {
     // read input file name from argv[1]
     if (argc < 2) {
@@ -49,8 +59,7 @@ int main(int argc, char* argv[]) {
             std::getline(ss, plateNum, ')');
             if (plateNum.size() > 0) {
                 // remove double quotes
-                plateNum.erase(plateNum.find_first_of('"'), 1);  // remove leading double quote
-                plateNum.erase(plateNum.find_last_of('"'), 1);   // remove trailing double quote
+                plateNum = getSubstringBetweenQuotes(plateNum);
                 if (rbt.addLicense(plateNum)) {
                     outFile << plateNum << " registered successfully." << std::endl;
                 } else {
@@ -60,42 +69,57 @@ int main(int argc, char* argv[]) {
             } else {
                 outFile << rbt.addLicense() << " created and registered successfully." << std::endl;
             }
-        } else if (command == "dropLicense") {
+        } else if (command == "dropLicence") {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
-            // plateNum.erase(0, 1);  // remove leading space
-            // plateNum.erase(plateNum.find_last_not_of(" \n\r\t") + 1);  // remove trailing
-            // whitespace
-            std::cout << "Dropping license: " << plateNum << std::endl;
-        } else if (command == "lookupLicense") {
+            plateNum = getSubstringBetweenQuotes(plateNum);
+            if (rbt.dropLicense(plateNum)) {
+                outFile << plateNum << " removed successfully." << std::endl;
+            } else {
+                outFile << "Failed to remove " << plateNum << ": does not exist." << std::endl;
+            }
+        } else if (command == "lookupLicence") {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
-            plateNum.erase(0, 1);                                      // remove leading space
-            plateNum.erase(plateNum.find_last_not_of(" \n\r\t") + 1);  // remove trailing whitespace
-            std::cout << "Looking up license: " << plateNum << std::endl;
+            plateNum = getSubstringBetweenQuotes(plateNum);
+            if (rbt.lookupLicense(plateNum)) {
+                outFile << plateNum << " exists." << std::endl;
+            } else {
+                outFile << plateNum << " does not exist." << std::endl;
+            }
         } else if (command == "lookupPrev") {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
-            plateNum.erase(0, 1);                                      // remove leading space
-            plateNum.erase(plateNum.find_last_not_of(" \n\r\t") + 1);  // remove trailing whitespace
-            std::cout << "Looking up previous license: " << plateNum << std::endl;
+            plateNum = getSubstringBetweenQuotes(plateNum);
+            std::string prevPlate = rbt.lookupPrev(plateNum);
+            outFile << plateNum << "'s prev is " << prevPlate << "." << std::endl;
         } else if (command == "lookupNext") {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
-            plateNum.erase(0, 1);                                      // remove leading space
-            plateNum.erase(plateNum.find_last_not_of(" \n\r\t") + 1);  // remove trailing whitespace
-            std::cout << "Looking up next license: " << plateNum << std::endl;
+            plateNum = getSubstringBetweenQuotes(plateNum);
+            std::string nextPlate = rbt.lookupNext(plateNum);
+            outFile << plateNum << "'s next is " << nextPlate << "." << std::endl;
         } else if (command == "lookupRange") {
             std::string lo, hi;
             std::getline(ss, lo, ',');
-            lo.erase(0, 1);                                // remove leading space
-            lo.erase(lo.find_last_not_of(" \n\r\t") + 1);  // remove trailing whitespace
             std::getline(ss, hi, ')');
-            hi.erase(0, 1);                                // remove leading space
-            hi.erase(hi.find_last_not_of(" \n\r\t") + 1);  // remove trailing whitespace
-            std::cout << "Looking up range: " << lo << " to " << hi << std::endl;
+
+            lo = getSubstringBetweenQuotes(lo);
+            hi = getSubstringBetweenQuotes(hi);
+
+            std::vector<std::string> plates = rbt.lookupRange(lo, hi);
+            outFile << "plate numbers between " << lo << " and " << hi << ": ";
+            for (const auto& plate : plates) {
+                outFile << plate;
+                if (&plate != &plates.back()) {
+                    outFile << ", ";
+                }
+            }
+            outFile << "." << std::endl;
         } else if (command == "revenue") {
-            std::cout << "Calculating revenue" << std::endl;
+            outFile << "Current annual revenue is " << rbt.revenue() << " Galleons." << std::endl;
+        } else if (command == "quit") {
+            break;
         } else {
             std::cerr << "Unknown command: " << command << std::endl;
         }
