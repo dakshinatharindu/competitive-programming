@@ -12,12 +12,13 @@ RedBlackTree::~RedBlackTree() {
     delete root;  // Destructor to clean up the tree
 }
 
-void RedBlackTree::addLicense() {
+std::string RedBlackTree::addLicense() {
     std::string plateNum;
 
     do {
         plateNum = randomPlate();
     } while (!insertLicense(plateNum, true));
+    return plateNum;
 }
 
 bool RedBlackTree::addLicense(std::string plateNum) { return insertLicense(plateNum, false); }

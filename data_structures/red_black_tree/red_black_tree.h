@@ -36,7 +36,7 @@ class RedBlackTree {
     RedBlackTree();
     ~RedBlackTree();
     bool addLicense(std::string plateNum);
-    void addLicense();
+    std::string addLicense();
     bool dropLicense(std::string plateNum);
     bool lookupLicense(std::string plateNum);
     std::string lookupPrev(std::string plateNum);
