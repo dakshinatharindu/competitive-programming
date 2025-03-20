@@ -24,9 +24,10 @@ class RedBlackTree {
     std::string randomPlate();
     void LLRotation(Node *&node);
     void RRRotation(Node *&node);
-    void fixInsertion(Node *&newPlate);
-    void fixDeletion(Node *&y, Node *&py);
     void transplant(Node *&u, Node *&v);
+    void fixInsertion(Node *&newPlate);
+    void fixDeletion(Node*& x, Node*& x_parent);
+    Node *minimum(Node *node);
 
    public:
     RedBlackTree();
@@ -40,4 +41,6 @@ class RedBlackTree {
     void lookupRange(std::string lo, std::string hi);
     void revenue();
     void quit();
+
+    void printTree();  // For debugging purposes
 };
