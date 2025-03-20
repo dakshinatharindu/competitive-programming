@@ -1,14 +1,15 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 enum Color { RED, BLACK };
 
 struct Node {
     std::string plateNum;
-    unsigned int revenue;
     Color color;
     Node *left, *right, *parent;
+    bool customized = false;
 
     Node(std::string plateNum) : plateNum(plateNum) {
         parent = left = right = nullptr;
@@ -19,6 +20,7 @@ struct Node {
 class RedBlackTree {
    private:
     Node *root;
+    int totalRevenue;
 
     // Helper functions for red-black tree properties
     std::string randomPlate();
@@ -28,6 +30,7 @@ class RedBlackTree {
     void fixInsertion(Node *&newPlate);
     void fixDeletion(Node*& x, Node*& x_parent);
     Node *minimum(Node *node);
+    bool insertLicense(std::string plateNum, bool customized);
 
    public:
     RedBlackTree();
@@ -35,12 +38,11 @@ class RedBlackTree {
     bool addLicense(std::string plateNum);
     void addLicense();
     bool dropLicense(std::string plateNum);
-    void lookupLicense(std::string plateNum);
-    void lookupPrev(std::string plateNum);
-    void lookupNext(std::string plateNum);
-    void lookupRange(std::string lo, std::string hi);
-    void revenue();
-    void quit();
+    bool lookupLicense(std::string plateNum);
+    std::string lookupPrev(std::string plateNum);
+    std::string lookupNext(std::string plateNum);
+    std::vector<std::string> lookupRange(std::string lo, std::string hi);
+    int revenue();
 
     void printTree();  // For debugging purposes
 };

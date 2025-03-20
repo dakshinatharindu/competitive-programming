@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Public member functions
 //////////////////////////////////////////////////////////////////////////////////
-RedBlackTree::RedBlackTree() : root(nullptr) {}
+RedBlackTree::RedBlackTree() : root(nullptr), totalRevenue(0) {}
 
 RedBlackTree::~RedBlackTree() {
     delete root;  // Destructor to clean up the tree
@@ -17,11 +17,14 @@ void RedBlackTree::addLicense() {
 
     do {
         plateNum = randomPlate();
-    } while (!addLicense(plateNum));
+    } while (!insertLicense(plateNum, true));
 }
 
-bool RedBlackTree::addLicense(std::string plateNum) {
+bool RedBlackTree::addLicense(std::string plateNum) { return insertLicense(plateNum, false); }
+
+bool RedBlackTree::insertLicense(std::string plateNum, bool customized) {
     Node* newPlate = new Node(plateNum);
+    newPlate->customized = customized;
     Node* parent = nullptr;
     Node* current = root;
 
@@ -46,6 +49,11 @@ bool RedBlackTree::addLicense(std::string plateNum) {
     }
 
     fixInsertion(newPlate);  // Fix the red-black tree properties
+    if (customized) {
+        totalRevenue += 7;
+    } else {
+        totalRevenue += 4;
+    }
     return true;
 }
 
@@ -106,9 +114,85 @@ bool RedBlackTree::dropLicense(std::string plateNum) {
         fixDeletion(x, x_parent);
     }
 
-    // delete z;
+    if (z->customized) {
+        totalRevenue -= 7;  // Adjust revenue for customized plates
+    } else {
+        totalRevenue -= 4;  // Adjust revenue for standard plates
+    }
+    delete z;
 
     return true;  // License plate removed successfully
+}
+
+bool RedBlackTree::lookupLicense(std::string plateNum) {
+    Node* node = root;
+
+    while (node != nullptr) {
+        if (node->plateNum == plateNum) {
+            return true;  // License plate found
+        }
+        if (node->plateNum < plateNum) {
+            node = node->right;
+        } else {
+            node = node->left;
+        }
+    }
+    return false;  // License plate not found
+}
+
+std::string RedBlackTree::lookupPrev(std::string plateNum) {
+    Node* node = root;
+    Node* prev = nullptr;
+
+    while (node != nullptr) {
+        if (node->plateNum < plateNum) {
+            prev = node;  // Update prev to current node
+            node = node->right;
+        } else {
+            node = node->left;
+        }
+    }
+
+    return (prev != nullptr) ? prev->plateNum : "";  // Return previous plate number or empty string
+}
+
+std::string RedBlackTree::lookupNext(std::string plateNum) {
+    Node* node = root;
+    Node* next = nullptr;
+
+    while (node != nullptr) {
+        if (node->plateNum > plateNum) {
+            next = node;  // Update next to current node
+            node = node->left;
+        } else {
+            node = node->right;
+        }
+    }
+
+    return (next != nullptr) ? next->plateNum : "";  // Return next plate number or empty string
+}
+
+std::vector<std::string> RedBlackTree::lookupRange(std::string lo, std::string hi) {
+    std::vector<std::string> result;
+    Node* node = root;
+
+    // In-order traversal to find all plates in the range [lo, hi]
+    std::function<void(Node*)> inOrder = [&](Node* node) {
+        if (node != nullptr) {
+            if (node->plateNum >= lo && node->plateNum <= hi) {
+                result.push_back(node->plateNum);
+            }
+            inOrder(node->left);
+            inOrder(node->right);
+        }
+    };
+    inOrder(node);
+
+    return result;  // Return the vector of plate numbers in the range
+}
+
+int RedBlackTree::revenue() {
+    return totalRevenue;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
