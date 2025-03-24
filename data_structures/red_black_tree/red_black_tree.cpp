@@ -17,11 +17,11 @@ std::string RedBlackTree::addLicense() {
 
     do {
         plateNum = randomPlate();
-    } while (!insertLicense(plateNum, true));
+    } while (!insertLicense(plateNum, false));
     return plateNum;
 }
 
-bool RedBlackTree::addLicense(std::string plateNum) { return insertLicense(plateNum, false); }
+bool RedBlackTree::addLicense(std::string plateNum) { return insertLicense(plateNum, true); }
 
 bool RedBlackTree::insertLicense(std::string plateNum, bool customized) {
     Node* newPlate = new Node(plateNum);

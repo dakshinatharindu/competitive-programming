@@ -6,16 +6,6 @@
 
 #include "red_black_tree.h"
 
-std::string getSubstringBetweenQuotes(const std::string& str) {
-    size_t start = str.find_first_of('"');
-    size_t end = str.find_last_of('"');
-
-    if (start != std::string::npos && end != std::string::npos && start != end) {
-        return str.substr(start + 1, end - start - 1);
-    }
-    return "";  // Return an empty string if quotes are not found or are invalid
-}
-
 int main(int argc, char* argv[]) {
     // read input file name from argv[1]
     if (argc < 2) {
@@ -58,8 +48,6 @@ int main(int argc, char* argv[]) {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
             if (plateNum.size() > 0) {
-                // remove double quotes
-                plateNum = getSubstringBetweenQuotes(plateNum);
                 if (rbt.addLicense(plateNum)) {
                     outFile << plateNum << " registered successfully." << std::endl;
                 } else {
@@ -72,7 +60,6 @@ int main(int argc, char* argv[]) {
         } else if (command == "dropLicence") {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
-            plateNum = getSubstringBetweenQuotes(plateNum);
             if (rbt.dropLicense(plateNum)) {
                 outFile << plateNum << " removed successfully." << std::endl;
             } else {
@@ -81,7 +68,6 @@ int main(int argc, char* argv[]) {
         } else if (command == "lookupLicence") {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
-            plateNum = getSubstringBetweenQuotes(plateNum);
             if (rbt.lookupLicense(plateNum)) {
                 outFile << plateNum << " exists." << std::endl;
             } else {
@@ -90,13 +76,11 @@ int main(int argc, char* argv[]) {
         } else if (command == "lookupPrev") {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
-            plateNum = getSubstringBetweenQuotes(plateNum);
             std::string prevPlate = rbt.lookupPrev(plateNum);
             outFile << plateNum << "'s prev is " << prevPlate << "." << std::endl;
         } else if (command == "lookupNext") {
             std::string plateNum;
             std::getline(ss, plateNum, ')');
-            plateNum = getSubstringBetweenQuotes(plateNum);
             std::string nextPlate = rbt.lookupNext(plateNum);
             outFile << plateNum << "'s next is " << nextPlate << "." << std::endl;
         } else if (command == "lookupRange") {
@@ -104,8 +88,9 @@ int main(int argc, char* argv[]) {
             std::getline(ss, lo, ',');
             std::getline(ss, hi, ')');
 
-            lo = getSubstringBetweenQuotes(lo);
-            hi = getSubstringBetweenQuotes(hi);
+            if (hi[0] == ' ') {
+                hi.erase(0, 1);
+            }
 
             std::vector<std::string> plates = rbt.lookupRange(lo, hi);
             outFile << "plate numbers between " << lo << " and " << hi << ": ";
