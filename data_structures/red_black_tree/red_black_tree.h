@@ -28,8 +28,8 @@ class RedBlackTree {
     void RRRotation(Node *&node);
     void transplant(Node *&u, Node *&v);
     void fixInsertion(Node *&newPlate);
-    void fixDeletion(Node*& x, Node*& x_parent);
-    Node *minimum(Node *node);
+    void fixDeletion(Node *&x, Node *&x_parent);
+    Node *maximum(Node *node);
     bool insertLicense(std::string plateNum, bool customized);
 
    public:

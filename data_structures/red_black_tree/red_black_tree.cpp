@@ -91,23 +91,23 @@ bool RedBlackTree::dropLicense(std::string plateNum) {
         x_parent = z->parent;
         transplant(z, z->left);
     } else {
-        y = minimum(z->right);
+        y = maximum(z->left);
         y_original_color = y->color;
-        x = y->right;
+        x = y->left;
 
         if (y->parent == z) {
             x_parent = y;
             if (x != nullptr) x->parent = y;
         } else {
             x_parent = y->parent;
-            transplant(y, y->right);
-            y->right = z->right;
-            y->right->parent = y;
+            transplant(y, y->left);  // Here we transplant left instead of right
+            y->left = z->left;
+            y->left->parent = y;
         }
 
         transplant(z, y);
-        y->left = z->left;
-        y->left->parent = y;
+        y->right = z->right;  // Keep the right subtree
+        y->right->parent = y;
         y->color = z->color;
     }
 
@@ -192,9 +192,7 @@ std::vector<std::string> RedBlackTree::lookupRange(std::string lo, std::string h
     return result;  // Return the vector of plate numbers in the range
 }
 
-int RedBlackTree::revenue() {
-    return totalRevenue;
-}
+int RedBlackTree::revenue() { return totalRevenue; }
 
 //////////////////////////////////////////////////////////////////////////////////
 // Private member functions
@@ -379,19 +377,6 @@ void RedBlackTree::RRRotation(Node*& node) {
     node->parent = temp;
 }
 
-void RedBlackTree::printTree() {
-    // In-order traversal to print the tree for debugging
-    std::function<void(Node*)> inOrder = [&](Node* node) {
-        if (node != nullptr) {
-            inOrder(node->left);
-            std::cout << node->plateNum << " (" << (node->color == RED ? "R" : "B") << ") ";
-            inOrder(node->right);
-        }
-    };
-    inOrder(root);
-    std::cout << std::endl;
-}
-
 void RedBlackTree::transplant(Node*& u, Node*& v) {
     if (u->parent == nullptr)
         root = v;
@@ -402,7 +387,45 @@ void RedBlackTree::transplant(Node*& u, Node*& v) {
     if (v != nullptr) v->parent = u->parent;
 }
 
-Node* RedBlackTree::minimum(Node* node) {
-    while (node->left != nullptr) node = node->left;
+Node* RedBlackTree::maximum(Node* node) {
+    while (node->right != nullptr) node = node->right;
     return node;
+}
+// void RedBlackTree::printTree() {
+//     // In-order traversal to print the tree for debugging
+//     std::function<void(Node*)> inOrder = [&](Node* node) {
+//         if (node != nullptr) {
+//             inOrder(node->left);
+//             std::cout << node->plateNum << " (" << (node->color == RED ? "R" : "B") << ") ";
+//             inOrder(node->right);
+//         }
+//     };
+//     inOrder(root);
+//     std::cout << std::endl;
+// }
+
+void printHelper(Node* root, std::string indent, bool last) {
+    if (root != nullptr) {
+        std::cout << indent;
+        if (last) {
+            std::cout << "R----";
+            indent += "   ";
+        } else {
+            std::cout << "L----";
+            indent += "|  ";
+        }
+        std::string sColor = (root->color == RED) ? "RED" : "BLACK";
+        std::cout << root->plateNum << "(" << sColor << ")" << std::endl;
+        printHelper(root->left, indent, false);
+        printHelper(root->right, indent, true);
+    }
+}
+
+void RedBlackTree::printTree() {
+    if (root == nullptr)
+        std::cout << "Tree is empty." << std::endl;
+    else {
+        std::cout << "Red-Black Tree:" << std::endl;
+        printHelper(root, "", true);
+    }
 }
