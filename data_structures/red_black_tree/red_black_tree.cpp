@@ -6,12 +6,18 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Public member functions
 //////////////////////////////////////////////////////////////////////////////////
-RedBlackTree::RedBlackTree() : root(nullptr), totalRevenue(0) {}
 
+// Constructor
+RedBlackTree::RedBlackTree() : root(nullptr), totalRevenue(0) {
+    // Initializes the root to nullptr and total revenue to 0
+} 
+
+// Destructor
 RedBlackTree::~RedBlackTree() {
-    delete root;  // Destructor to clean up the tree
+    delete root;  // Clean up the tree
 }
 
+// Function to add a license plate with random plate number
 std::string RedBlackTree::addLicense() {
     std::string plateNum;
 
@@ -21,43 +27,10 @@ std::string RedBlackTree::addLicense() {
     return plateNum;
 }
 
+// Function to add a license plate with a specific plate number
 bool RedBlackTree::addLicense(std::string plateNum) { return insertLicense(plateNum, true); }
 
-bool RedBlackTree::insertLicense(std::string plateNum, bool customized) {
-    Node* newPlate = new Node(plateNum);
-    newPlate->customized = customized;
-    Node* parent = nullptr;
-    Node* current = root;
-
-    while (current != nullptr) {
-        parent = current;
-        if (newPlate->plateNum < current->plateNum) {
-            current = current->left;
-        } else if (newPlate->plateNum > current->plateNum) {
-            current = current->right;
-        } else {
-            delete newPlate;  // Duplicate plate number, do not add
-            return false;
-        }
-    }
-    newPlate->parent = parent;
-    if (parent == nullptr) {
-        root = newPlate;  // Tree was empty
-    } else if (newPlate->plateNum < parent->plateNum) {
-        parent->left = newPlate;
-    } else {
-        parent->right = newPlate;
-    }
-
-    fixInsertion(newPlate);  // Fix the red-black tree properties
-    if (customized) {
-        totalRevenue += 7;
-    } else {
-        totalRevenue += 4;
-    }
-    return true;
-}
-
+// Function to drop a license plate
 bool RedBlackTree::dropLicense(std::string plateNum) {
     Node* z = nullptr;
     Node *x, *y;
@@ -125,6 +98,7 @@ bool RedBlackTree::dropLicense(std::string plateNum) {
     return true;  // License plate removed successfully
 }
 
+// Function to lookup a license plate
 bool RedBlackTree::lookupLicense(std::string plateNum) {
     Node* node = root;
 
@@ -141,6 +115,7 @@ bool RedBlackTree::lookupLicense(std::string plateNum) {
     return false;  // License plate not found
 }
 
+// Function to lookup the previous license plate
 std::string RedBlackTree::lookupPrev(std::string plateNum) {
     Node* node = root;
     Node* prev = nullptr;
@@ -157,6 +132,7 @@ std::string RedBlackTree::lookupPrev(std::string plateNum) {
     return (prev != nullptr) ? prev->plateNum : "";  // Return previous plate number or empty string
 }
 
+// Function to lookup the next license plate
 std::string RedBlackTree::lookupNext(std::string plateNum) {
     Node* node = root;
     Node* next = nullptr;
@@ -173,6 +149,7 @@ std::string RedBlackTree::lookupNext(std::string plateNum) {
     return (next != nullptr) ? next->plateNum : "";  // Return next plate number or empty string
 }
 
+// Function to lookup a range of license plates
 std::vector<std::string> RedBlackTree::lookupRange(std::string lo, std::string hi) {
     std::vector<std::string> result;
     Node* node = root;
@@ -192,11 +169,50 @@ std::vector<std::string> RedBlackTree::lookupRange(std::string lo, std::string h
     return result;  // Return the vector of plate numbers in the range
 }
 
+// Function to get the total revenue
 int RedBlackTree::revenue() { return totalRevenue; }
 
 //////////////////////////////////////////////////////////////////////////////////
 // Private member functions
 //////////////////////////////////////////////////////////////////////////////////
+
+// Function to insert a license plate into the red-black tree
+bool RedBlackTree::insertLicense(std::string plateNum, bool customized) {
+    Node* newPlate = new Node(plateNum);
+    newPlate->customized = customized;
+    Node* parent = nullptr;
+    Node* current = root;
+
+    while (current != nullptr) {
+        parent = current;
+        if (newPlate->plateNum < current->plateNum) {
+            current = current->left;
+        } else if (newPlate->plateNum > current->plateNum) {
+            current = current->right;
+        } else {
+            delete newPlate;  // Duplicate plate number, do not add
+            return false;
+        }
+    }
+    newPlate->parent = parent;
+    if (parent == nullptr) {
+        root = newPlate;  // Tree was empty
+    } else if (newPlate->plateNum < parent->plateNum) {
+        parent->left = newPlate;
+    } else {
+        parent->right = newPlate;
+    }
+
+    fixInsertion(newPlate);  // Fix the red-black tree properties
+    if (customized) {
+        totalRevenue += 7;
+    } else {
+        totalRevenue += 4;
+    }
+    return true;
+}
+
+// Randomly generate a license plate number
 std::string RedBlackTree::randomPlate() {
     std::string plateNum;
     // Generate a random license plate number with 4 charaters including A-Z and 0-9
@@ -211,6 +227,7 @@ std::string RedBlackTree::randomPlate() {
     return plateNum;
 }
 
+// Fix the red-black tree properties after insertion
 void RedBlackTree::fixInsertion(Node*& newPlate) {
     Node* parent = nullptr;
     Node* grandparent = nullptr;
@@ -265,6 +282,7 @@ void RedBlackTree::fixInsertion(Node*& newPlate) {
     root->color = BLACK;  // Ensure the root is always black
 }
 
+// Fix the red-black tree properties after deletion
 void RedBlackTree::fixDeletion(Node*& x, Node*& x_parent) {
     Node* s;
 
@@ -341,6 +359,7 @@ void RedBlackTree::fixDeletion(Node*& x, Node*& x_parent) {
     if (x != nullptr) x->color = BLACK;
 }
 
+// LL Rotation
 void RedBlackTree::LLRotation(Node*& node) {
     Node* temp = node->left;
     node->left = temp->right;
@@ -359,6 +378,7 @@ void RedBlackTree::LLRotation(Node*& node) {
     node->parent = temp;
 }
 
+// RR Rotation
 void RedBlackTree::RRRotation(Node*& node) {
     Node* temp = node->right;
     node->right = temp->left;
@@ -377,6 +397,7 @@ void RedBlackTree::RRRotation(Node*& node) {
     node->parent = temp;
 }
 
+// Transplant function to replace one subtree with another
 void RedBlackTree::transplant(Node*& u, Node*& v) {
     if (u->parent == nullptr)
         root = v;
@@ -387,23 +408,13 @@ void RedBlackTree::transplant(Node*& u, Node*& v) {
     if (v != nullptr) v->parent = u->parent;
 }
 
+// Function to find the maximum node in a subtree
 Node* RedBlackTree::maximum(Node* node) {
     while (node->right != nullptr) node = node->right;
     return node;
 }
-// void RedBlackTree::printTree() {
-//     // In-order traversal to print the tree for debugging
-//     std::function<void(Node*)> inOrder = [&](Node* node) {
-//         if (node != nullptr) {
-//             inOrder(node->left);
-//             std::cout << node->plateNum << " (" << (node->color == RED ? "R" : "B") << ") ";
-//             inOrder(node->right);
-//         }
-//     };
-//     inOrder(root);
-//     std::cout << std::endl;
-// }
 
+// Function to print the tree (for debugging purposes)
 void printHelper(Node* root, std::string indent, bool last) {
     if (root != nullptr) {
         std::cout << indent;
@@ -421,6 +432,7 @@ void printHelper(Node* root, std::string indent, bool last) {
     }
 }
 
+// This function prints the tree in a structured format
 void RedBlackTree::printTree() {
     if (root == nullptr)
         std::cout << "Tree is empty." << std::endl;
