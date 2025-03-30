@@ -10,11 +10,22 @@
 // Constructor
 RedBlackTree::RedBlackTree() : root(nullptr), totalRevenue(0) {
     // Initializes the root to nullptr and total revenue to 0
-} 
+}
 
 // Destructor
 RedBlackTree::~RedBlackTree() {
-    delete root;  // Clean up the tree
+    // delete all nodes in the tree to prevent memory leaks
+    // Use a recursive function to delete all nodes in the tree 
+    Node* current = root;
+    std::function<void(Node*)> deleteTree = [&](Node* node) {
+        if (node != nullptr) {
+            deleteTree(node->left);
+            deleteTree(node->right);
+            delete node;  // Delete the current node
+        }
+    };
+    deleteTree(current);  // Start deleting from the root
+    root = nullptr;  // Set root to nullptr after deletion
 }
 
 // Function to add a license plate with random plate number
