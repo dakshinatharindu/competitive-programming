@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
         baseName = inputFile;
         inputFile += ".txt";
     }
-    std::string outputFile = baseName + "_output_file.txt";
+    std::string outputFile = baseName + "_output.txt";
     std::ofstream outFile(outputFile, std::ios::out);
     if (!outFile.is_open()) {
         std::cerr << "Error opening file: " << outputFile << std::endl;

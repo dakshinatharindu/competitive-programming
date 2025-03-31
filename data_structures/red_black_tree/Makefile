@@ -12,6 +12,8 @@ HEADERS=red_black_tree.h
 # Object files
 OBJS=$(SRCS:.cpp=.o)
 
+all: $(TARGET)
+
 # Build the target executable
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
