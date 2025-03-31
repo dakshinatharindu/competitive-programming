@@ -15,7 +15,7 @@ RedBlackTree::RedBlackTree() : root(nullptr), totalRevenue(0) {
 // Destructor
 RedBlackTree::~RedBlackTree() {
     // delete all nodes in the tree to prevent memory leaks
-    // Use a recursive function to delete all nodes in the tree 
+    // Use a recursive function to delete all nodes in the tree
     Node* current = root;
     std::function<void(Node*)> deleteTree = [&](Node* node) {
         if (node != nullptr) {
@@ -25,7 +25,7 @@ RedBlackTree::~RedBlackTree() {
         }
     };
     deleteTree(current);  // Start deleting from the root
-    root = nullptr;  // Set root to nullptr after deletion
+    root = nullptr;       // Set root to nullptr after deletion
 }
 
 // Function to add a license plate with random plate number
@@ -60,41 +60,48 @@ bool RedBlackTree::dropLicense(std::string plateNum) {
             node = node->left;
     }
 
-    if (z == nullptr) return false;  // Key not found
+    if (z == nullptr) return false;  // Key not found. Return false
 
     y = z;
-    Color y_original_color = y->color;
+    Color y_original_color = y->color; // Store the original color of the node to check later
     Node* x_parent;
 
     if (z->left == nullptr) {
+        // Case 1: z has no left child
         x = z->right;
         x_parent = z->parent;
-        transplant(z, z->right);
+        transplant(z, z->right); // Transplant z with its right child
     } else if (z->right == nullptr) {
+        // Case 2: z has no right child
         x = z->left;
         x_parent = z->parent;
-        transplant(z, z->left);
+        transplant(z, z->left); // Transplant z with its left child
     } else {
-        y = maximum(z->left);
-        y_original_color = y->color;
+        // Case 3: z has both left and right children
+        y = maximumNode(z->left); // Find the maximum node in the left subtree
+        y_original_color = y->color; 
         x = y->left;
 
         if (y->parent == z) {
+            // If y is a direct child of z, set x to y's left child
             x_parent = y;
-            if (x != nullptr) x->parent = y;
+            if (x != nullptr) x->parent = y; // If y is a direct child of z, set x's parent to y
         } else {
+            // If y is not a direct child of z, transplant y with its left child
             x_parent = y->parent;
-            transplant(y, y->left);  // Here we transplant left instead of right
+            transplant(y, y->left); 
             y->left = z->left;
             y->left->parent = y;
         }
 
-        transplant(z, y);
-        y->right = z->right;  // Keep the right subtree
+        // Now transplant z with y
+        transplant(z, y); 
+        y->right = z->right;
         y->right->parent = y;
         y->color = z->color;
     }
 
+    // After transplanting, we need to fix the red-black tree properties
     if (y_original_color == BLACK && x_parent != nullptr) {
         fixDeletion(x, x_parent);
     }
@@ -113,6 +120,7 @@ bool RedBlackTree::dropLicense(std::string plateNum) {
 bool RedBlackTree::lookupLicense(std::string plateNum) {
     Node* node = root;
 
+    // Traverse the tree to find the license plate
     while (node != nullptr) {
         if (node->plateNum == plateNum) {
             return true;  // License plate found
@@ -131,6 +139,7 @@ std::string RedBlackTree::lookupPrev(std::string plateNum) {
     Node* node = root;
     Node* prev = nullptr;
 
+    // Traverse the tree to find the previous license plate
     while (node != nullptr) {
         if (node->plateNum < plateNum) {
             prev = node;  // Update prev to current node
@@ -148,6 +157,7 @@ std::string RedBlackTree::lookupNext(std::string plateNum) {
     Node* node = root;
     Node* next = nullptr;
 
+    // Traverse the tree to find the next license plate
     while (node != nullptr) {
         if (node->plateNum > plateNum) {
             next = node;  // Update next to current node
@@ -168,16 +178,20 @@ std::vector<std::string> RedBlackTree::lookupRange(std::string lo, std::string h
     // In-order traversal to find all plates in the range [lo, hi]
     std::function<void(Node*)> inOrder = [&](Node* node) {
         if (node != nullptr) {
+            if (node->plateNum > lo) {
+                inOrder(node->left);
+            }
             if (node->plateNum >= lo && node->plateNum <= hi) {
                 result.push_back(node->plateNum);
             }
-            inOrder(node->left);
-            inOrder(node->right);
+            if (node->plateNum < hi) {
+                inOrder(node->right);
+            }
         }
     };
     inOrder(node);
 
-    return result;  // Return the vector of plate numbers in the range
+    return result;  // Return the vector of plate numbers in lexicographical order
 }
 
 // Function to get the total revenue
@@ -242,6 +256,7 @@ std::string RedBlackTree::randomPlate() {
 void RedBlackTree::fixInsertion(Node*& newPlate) {
     Node* parent = nullptr;
     Node* grandparent = nullptr;
+
     while ((newPlate != root) && (newPlate->color == RED) && (newPlate->parent->color == RED)) {
         parent = newPlate->parent;
         grandparent = parent->parent;
@@ -257,12 +272,12 @@ void RedBlackTree::fixInsertion(Node*& newPlate) {
             } else {
                 // Case LYb: d is black
                 if (newPlate == parent->right) {
-                    RRRotation(parent);         // Case 2a: newPlate is right child
+                    RRRotation(parent);         // Case LRb: Need to do LR rotation (LR = RR + LL)
                     newPlate = parent;          // Update newPlate to parent
                     parent = newPlate->parent;  // Update parent
                 }
-                // Case 2b: newPlate is left child
-                LLRotation(grandparent);
+
+                LLRotation(grandparent); 
                 std::swap(parent->color,
                           grandparent->color);  // Swap colors
                 newPlate = parent;
@@ -278,11 +293,11 @@ void RedBlackTree::fixInsertion(Node*& newPlate) {
             } else {
                 // Case RYb: d is black
                 if (newPlate == parent->left) {
-                    LLRotation(parent);         // Case 2a: newPlate is left child
+                    LLRotation(parent);         // Case RLb: Need to do RL rotation (RL = LL + RR)
                     newPlate = parent;          // Update newPlate to parent
                     parent = newPlate->parent;  // Update parent
                 }
-                // Case 2b: newPlate is right child
+
                 RRRotation(grandparent);
                 std::swap(parent->color,
                           grandparent->color);  // Swap colors
@@ -295,79 +310,78 @@ void RedBlackTree::fixInsertion(Node*& newPlate) {
 
 // Fix the red-black tree properties after deletion
 void RedBlackTree::fixDeletion(Node*& x, Node*& x_parent) {
-    Node* s;
+    Node* v;
 
     while (x != root && (x == nullptr || x->color == BLACK)) {
         if (x == x_parent->left) {
-            s = x_parent->right;
+            v = x_parent->right;
 
-            if (s->color == RED) {
-                // Case 1: s is red
-                s->color = BLACK;
+            if (v->color == RED) {
+                // Case Lr(n)
+                v->color = BLACK;
                 x_parent->color = RED;
                 RRRotation(x_parent);
-                s = x_parent->right;
+                v = x_parent->right;
             }
 
-            if ((s->left == nullptr || s->left->color == BLACK) &&
-                (s->right == nullptr || s->right->color == BLACK)) {
-                // Case 2: s is black, and both of s's children are black
-                s->color = RED;
+            if ((v->left == nullptr || v->left->color == BLACK) &&
+                (v->right == nullptr || v->right->color == BLACK)) {
+                // Case Lc0: both of v's children are black
+                v->color = RED;
                 x = x_parent;
                 x_parent = x->parent;
             } else {
-                if (s->right == nullptr || s->right->color == BLACK) {
-                    // Case 3: s is black, s's left child is red, s's right child is black
-                    if (s->left != nullptr) s->left->color = BLACK;
-                    s->color = RED;
-                    LLRotation(s);
-                    s = x_parent->right;
+                if (v->right == nullptr || v->right->color == BLACK) {
+                    // Case Lc1: v's left child is red, v's right child is black
+                    if (v->left != nullptr) v->left->color = BLACK;
+                    v->color = RED;
+                    LLRotation(v);
+                    v = x_parent->right;
                 }
-
-                // Case 4: s is black, s's right child is red
-                s->color = x_parent->color;
+                // Case Lc1 or Lc2: v's right child is red
+                v->color = x_parent->color;
                 x_parent->color = BLACK;
-                if (s->right != nullptr) s->right->color = BLACK;
+                if (v->right != nullptr) v->right->color = BLACK;
                 RRRotation(x_parent);
                 x = root;
             }
         } else {
-            s = x_parent->left;
+            v = x_parent->left;
 
-            if (s->color == RED) {
-                // Case 1: s is red
-                s->color = BLACK;
+            if (v->color == RED) {
+                // Case Rr(n)
+                v->color = BLACK;
                 x_parent->color = RED;
                 LLRotation(x_parent);
-                s = x_parent->left;
+                v = x_parent->left;
             }
 
-            if ((s->right == nullptr || s->right->color == BLACK) &&
-                (s->left == nullptr || s->left->color == BLACK)) {
-                // Case 2: s is black, and both of s's children are black
-                s->color = RED;
+            if ((v->right == nullptr || v->right->color == BLACK) &&
+                (v->left == nullptr || v->left->color == BLACK)) {
+                // Case Rc0: both of v's children are black
+                v->color = RED;
                 x = x_parent;
                 x_parent = x->parent;
             } else {
-                if (s->left == nullptr || s->left->color == BLACK) {
-                    // Case 3: s is black, s's right child is red, s's left child is black
-                    if (s->right != nullptr) s->right->color = BLACK;
-                    s->color = RED;
-                    RRRotation(s);
-                    s = x_parent->left;
+                if (v->left == nullptr || v->left->color == BLACK) {
+                    // Case Rc1: v's right child is red, v's left child is black
+                    if (v->right != nullptr) v->right->color = BLACK;
+                    v->color = RED;
+                    RRRotation(v);
+                    v = x_parent->left;
                 }
 
-                // Case 4: s is black, s's left child is red
-                s->color = x_parent->color;
+                // Case Rc1 or Rc2: v's left child is red
+                v->color = x_parent->color;
                 x_parent->color = BLACK;
-                if (s->left != nullptr) s->left->color = BLACK;
+                if (v->left != nullptr) v->left->color = BLACK;
                 LLRotation(x_parent);
                 x = root;
             }
         }
     }
 
-    if (x != nullptr) x->color = BLACK;
+    if (x != nullptr) x->color = BLACK; 
 }
 
 // LL Rotation
@@ -420,35 +434,7 @@ void RedBlackTree::transplant(Node*& u, Node*& v) {
 }
 
 // Function to find the maximum node in a subtree
-Node* RedBlackTree::maximum(Node* node) {
+Node* RedBlackTree::maximumNode(Node* node) {
     while (node->right != nullptr) node = node->right;
     return node;
-}
-
-// Function to print the tree (for debugging purposes)
-void printHelper(Node* root, std::string indent, bool last) {
-    if (root != nullptr) {
-        std::cout << indent;
-        if (last) {
-            std::cout << "R----";
-            indent += "   ";
-        } else {
-            std::cout << "L----";
-            indent += "|  ";
-        }
-        std::string sColor = (root->color == RED) ? "RED" : "BLACK";
-        std::cout << root->plateNum << "(" << sColor << ")" << std::endl;
-        printHelper(root->left, indent, false);
-        printHelper(root->right, indent, true);
-    }
-}
-
-// This function prints the tree in a structured format
-void RedBlackTree::printTree() {
-    if (root == nullptr)
-        std::cout << "Tree is empty." << std::endl;
-    else {
-        std::cout << "Red-Black Tree:" << std::endl;
-        printHelper(root, "", true);
-    }
 }

@@ -27,9 +27,9 @@ class RedBlackTree {
     void LLRotation(Node *&node);
     void RRRotation(Node *&node);
     void transplant(Node *&u, Node *&v);
+    Node *maximumNode(Node *node);
     void fixInsertion(Node *&newPlate);
     void fixDeletion(Node *&x, Node *&x_parent);
-    Node *maximum(Node *node);
     bool insertLicense(std::string plateNum, bool customized);
 
    public:
@@ -43,6 +43,4 @@ class RedBlackTree {
     std::string lookupNext(std::string plateNum);
     std::vector<std::string> lookupRange(std::string lo, std::string hi);
     int revenue();
-
-    void printTree();  // For debugging purposes
 };
