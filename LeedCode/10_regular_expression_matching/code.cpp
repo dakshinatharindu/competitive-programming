@@ -3,18 +3,37 @@
 using namespace std;
 
 class Solution {
-public:
-  bool isMatch(string s, string p) {
-    int i = 0, j = 0;
-    for (char &c : p) {
-      i++;
-    }
+   public:
+    bool isMatch(string s, string p) {
+        char prev;
+        int i = 0, j = 0;
+        while (j <= s.size()) {
+            if (i == p.size()) {
+                return false;
+            }
 
-    return true;
-  }
+            if (p[i] == s[j] || p[i] == '.') {
+                prev = s[j];
+                i++;
+                continue;
+            }
+
+            if (p[i] == '*') {
+                if (prev == s[j]) {
+                    j++;
+                    continue;
+                } else {
+                    i++;
+                    continue;
+                }
+            }
+        }
+
+        return true;
+    }
 };
 
 int main() {
-  Solution s;
-  cout << s.isMatch("aa", "a.");
+    Solution s;
+    cout << s.isMatch("aa", "a*") << endl;
 }
