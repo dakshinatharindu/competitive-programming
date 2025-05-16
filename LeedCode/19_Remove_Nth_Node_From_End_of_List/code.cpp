@@ -22,15 +22,17 @@ class Solution {
         head = orig_head;
         count -= n;
 
-        cout << count << endl;
+        if (count == 0) {
+            return head->next;
+        }
 
-        while (count != 0) {
+        while (count != 1) {
             head = head->next;
             count -= 1;
         }
-        head = head->next;
+        head->next = head->next->next;
 
-        return head;
+        return orig_head;
     }
 };
 
@@ -42,10 +44,10 @@ int main() {
     // head->next->next = new ListNode(3);
     // head->next->next->next = new ListNode(4);
 
-    s.removeNthFromEnd(head, 1);
+    
     
     // Print the modified list
-    ListNode* current = head;
+    ListNode* current = s.removeNthFromEnd(head, 2);
     while (current != nullptr) {
         std::cout << current->val << " ";
         current = current->next;
