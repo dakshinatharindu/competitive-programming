@@ -14,7 +14,29 @@ struct TreeNode {
 
 class Solution {
    public:
-    vector<vector<int>> pathSum(TreeNode *root, int targetSum) {}
+    void findPaths(TreeNode *root, int targetSum, vector<int> &currentPath, vector<vector<int>> &result) {
+        if (root == nullptr) {
+            return;
+        } else if ((root->left == nullptr) && (root->right == nullptr) && (root->val == targetSum)) {
+            currentPath.push_back(targetSum);
+            result.push_back(currentPath);
+            currentPath.pop_back();
+        } else {
+            currentPath.push_back(root->val);
+            findPaths(root->left, targetSum - root->val, currentPath, result);
+            findPaths(root->right, targetSum - root->val, currentPath, result);
+            currentPath.pop_back();
+        }
+
+    }
+
+    vector<vector<int>> pathSum(TreeNode *root, int targetSum) {
+        vector<vector<int>> result;
+        vector<int> currentPath;
+        findPaths(root, targetSum, currentPath, result);
+        return result;
+
+    }
 };
 
 int main() {
@@ -33,5 +55,13 @@ int main() {
     // Clean up memory (not shown here)
 
     std::cout << "Paths with sum " << targetSum << ": " << result.size() << std::endl;
+    for (const auto &path : result) {
+        std::cout << "Path: ";
+        for (int val : path) {
+            std::cout << val << " ";
+        }
+        std::cout << std::endl;
+    }
+
     return 0;
 }
