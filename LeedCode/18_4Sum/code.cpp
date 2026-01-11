@@ -1,47 +1,50 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
 class Solution {
-public:
+   public:
     vector<vector<int>> fourSum(vector<int>& nums, int target) {
+        vector<vector<int>> result;
+        int n = nums.size();
+        if (n < 4) return result;
+
         sort(nums.begin(), nums.end());
-        vector<vector<int>> out;
 
-        int a = 0;
-        int b = nums.size() - 1;
+        for (int i = 0; i < n - 3; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) continue;
+            for (int j = n - 1; j > 2; j--) {
+                if ((j < n - 1) && nums[j] == nums[j + 1]) continue;
 
-        int ptarget;
-        while (a < b) {
-            ptarget = target - nums[a] - nums[b];
-            int first = a + 1;
-            int last = b - 1;
+                int left = i + 1;
+                int right = j - 1;
 
-            while (first < last) {
-                if (nums[first] + nums[last] == ptarget) {
-                    out.push_back({nums[a], nums[first], nums[last], nums[b]});
-                    break;
-                } else if (nums[first] + nums[last] < target) {
-                    first++;
-                } else {
-                    last--;
+                while (left < right) {
+                    long int sum = (long int)nums[i] + (long int)nums[left] +
+                                   (long int)nums[right] + (long int)nums[j];
+
+                    if (sum == target) {
+                        result.push_back(
+                            {nums[i], nums[left], nums[right], nums[j]});
+                        while (left < right && nums[left] == nums[left + 1])
+                            left++;
+                        while (left < right && nums[right] == nums[right - 1])
+                            right--;
+                        left++;
+                        right--;
+                    } else if (sum < target) {
+                        left++;
+                    } else {
+                        right--;
+                    }
                 }
             }
-
-            while (a < b && nums[a] == nums[a + 1]) {
-                a++;
-            }
-            while (a < b && nums[b] == nums[b - 1]) {
-                b--;
-            }
-            
-            
         }
 
-        return out;
+        return result;
     }
 };
 
@@ -53,7 +56,7 @@ int main() {
 
     cout << "Pairs that sum to " << target << ":\n";
     for (const auto& pair : result) {
-        cout << "[" << pair[0] << ", " << pair[1] << "]\n";
+        cout << "[" << pair[0] << ", " << pair[1] << ", " << pair[2] << ", " << pair[3] << "]\n";
     }
 
     return 0;
