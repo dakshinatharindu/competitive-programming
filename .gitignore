@@ -5,3 +5,5 @@
 code
 .vscode/
 *.o
+LeedCode/58_length_of_last_word/solution/target
+target/rust-analyzer/flycheck0
